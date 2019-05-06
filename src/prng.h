@@ -12,19 +12,23 @@
 namespace isai
 {
 
+  // alias for single byte
   using byte_t = unsigned char;
 
+  // random number generation utils
   class prng_t
   {
   private:
     prng_t() noexcept = default;
 
   public:
+    // initializes prng device
     static void initialize() noexcept
     {
       s_eng = std::default_random_engine{ s_dev() };
     }
 
+    // gets array of random doubles from given range
     static std::vector< double >
     get_uniform_doubles( std::size_t count, double lo, double hi ) noexcept
     {
@@ -40,6 +44,7 @@ namespace isai
       return res;
     }
 
+    // fills given byte array with random bits
     template < std::size_t N >
     static void fill_with_random_bits( std::array< byte_t, N > &bit_array )
     {
@@ -50,6 +55,7 @@ namespace isai
       }
     }
 
+    // probability [0,1] to binary success/failure
     static bool perc_check( double perc ) noexcept
     {
       assert( perc >= 0.0 );
@@ -57,6 +63,7 @@ namespace isai
       return perc >= std::generate_canonical< double, 64 >( s_eng );
     }
 
+    // random index for chromosome crossover point
     template < std::size_t N >
     static std::size_t get_crossover_point()
     {
@@ -64,6 +71,7 @@ namespace isai
       return dist( s_eng );
     }
 
+    // picks random index from array of increasing probabilities (cdf)
     static std::size_t pick_by_prob( std::vector< double > const &table )
     {
       auto val = std::generate_canonical< double, 64 >( s_eng );
@@ -77,6 +85,7 @@ namespace isai
       return table.size() - 1;
     }
 
+    // shuffles elements of given vector
     template < typename T >
     static void shuffle( std::vector< T > &v )
     {

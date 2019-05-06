@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.10 )
 
 # project name and version
-project( isai-genepi )
+project( isai-genepa )
 
 # setting default output directories for built targets
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" )
@@ -21,7 +21,7 @@ add_compile_options( -O2 )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # project executable target
-add_executable( genepi
+add_executable( genepa
     src/prng.h
     src/prng.cpp
     src/poly.h
@@ -30,8 +30,8 @@ add_executable( genepi
     src/chromo.cpp
     src/alg.h
     src/alg.cpp
-    src/test.cpp )
+    src/exec.cpp )
 
-target_include_directories( genepi
+target_include_directories( genepa
   PRIVATE
     src )
