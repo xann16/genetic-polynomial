@@ -1,0 +1,9 @@
+random input:           true
+input coefficients:     0.00 0.00 1.00 0.00 0.00
+
+population size:         1000
+maximum generations:    10000
+training data size:        50
+error threshold:            0.01
+base mutation rate :        0.001
+

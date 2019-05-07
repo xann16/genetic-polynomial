@@ -36,7 +36,6 @@ namespace isai
 
     bool is_input_random = true;
     bool is_verbose = false;
-    bool is_autorun = false;
   };
 
   template < std::size_t N >
@@ -60,14 +59,15 @@ namespace isai
                     ? to_polynomial( chromosome_t< 35 >{} )
                     : polynomial_t< 4 >{ m_settings.input_coeffs.data() };
 
+      std::printf( "Initializing approximation using genetic algorithm for "
+                   "polynomial: \n        " );
+      poly.print();
+      std::printf( "        (i.e.: P(x) =" );
+      poly.print( true );
+      std::printf( ")\n" );
+
       if ( m_settings.is_verbose )
       {
-        std::printf( "Initializing approximation using genetic algorithm for "
-                     "polynomial: \n" );
-        poly.print();
-        std::printf( "\t (i.e.: P(x) =" );
-        poly.print( true );
-        std::printf( ")\n" );
         std::printf( "Main model parameters:\n" );
         std::printf( " - population size:                %5lu\n",
                      m_settings.pop_size );
@@ -98,7 +98,7 @@ namespace isai
       auto progress_file_path =
         std::string{ "data/" } + m_settings.batch_name + "_progress_data.tsv";
       auto fout =
-        std::ostream{ progress_file_path, std::ios::out | std::ios::trunc };
+        std::ofstream{ progress_file_path, std::ios::out | std::ios::trunc };
 
       m_error = 2.0 * m_settings.error_threshold;
       calculate_fitness_scores_and_error_metrics();
@@ -124,12 +124,13 @@ namespace isai
 
     // returns polynomial representing member of final population with best
     // fitness (least approx error)
-    auto const &result() const
+    auto result() const
     {
-      auto res = to_polynomial( best_individual() );
+      auto res_ch = best_individual();
+      auto res = to_polynomial( res_ch );
       res.to_file( std::string{ "data/" } + m_settings.batch_name +
                    "_output_poly.tsv" );
-      return res;
+      return std::make_pair( res, eval_error( res_ch, m_tdata ) );
     }
 
   private:
@@ -206,7 +207,7 @@ namespace isai
       }
 
       // update error of population's best member
-      auto err_of_best = eval_fitness( best_individual(), m_tdata );
+      auto err_of_best = eval_error( best_individual(), m_tdata );
 
       // check if that error changed enougn - if not increment repeat counter
       auto diff = std::abs( err_of_best - m_error );
@@ -319,6 +320,11 @@ namespace isai
                           static_cast< double >( m_best_repeats ) *
                           m_settings.mutation_rate_growth_coeff;
       }
+
+      if ( m_mutation_rate > 1.0 )
+      {
+        m_mutation_rate = 1.0;
+      }
     }
 
 
@@ -370,6 +376,11 @@ namespace isai
     // prints to stdout info abot final state
     void print_completion_info()
     {
+      if ( m_settings.is_verbose )
+      {
+        std::printf( "\n" );
+      }
+
       if ( m_curr_gen == m_settings.max_gens )
       {
         std::printf(
@@ -380,7 +391,7 @@ namespace isai
       {
         std::printf( "Training ended after %lu generations finding solution "
                      "that satisfies requested precision.\n",
-                     m_curr_gen );
+                     m_curr_gen - 1 );
       }
     }
 

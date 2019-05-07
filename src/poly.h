@@ -122,7 +122,7 @@ namespace isai
         bool is_started = false;
         for ( auto i = static_cast< int >( order() ); i >= 0; i-- )
         {
-          auto val = m_data[ i ];
+          auto val = m_data[ static_cast< std::size_t >( i ) ];
 
           // sign
           if ( val < 0.0 )
@@ -145,8 +145,13 @@ namespace isai
             continue;
           }
 
+          is_started = true;
+
           // coeff
-          std::printf( "%.2f", std::abs( val ) );
+          if ( std::abs( val ) != 1.0 )
+          {
+            std::printf( "%.2f", std::abs( val ) );
+          }
 
           // variable
           if ( i != 0 )
